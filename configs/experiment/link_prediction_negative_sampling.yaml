@@ -1,0 +1,52 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=link_prediction_negative_sampling
+
+defaults:
+  - override /datamodule: mepgraph_link_pred.yaml
+  - override /model: mlp_enc_spatial_link_dec.yaml
+
+tags: ["link prediction", "MEPGraph"]
+
+seed: 12345
+
+# callbacks:
+#   model_checkpoint:
+#     monitor: "val/auc"
+#   early_stopping:
+#     monitor: "val/auc"
+
+model:
+  use_collision_edges: false
+
+trainer:
+  max_epochs: 100
+  log_every_n_steps: 1
+
+datamodule:
+  transform:
+    _target_: torch_geometric.transforms.Compose
+    transforms:
+      - _target_: src.utils.transforms.ToOneHotFeature
+        feature: 'ifc_class'
+        num_classes: 44
+        save_as: one_hot_class
+      - _target_: src.utils.transforms.ConcatFeatures
+        features: ["pos", "rotation", "extent", "one_hot_class"]
+  transform_once_train:
+    _target_: torch_geometric.transforms.Compose
+    transforms:
+      - _target_: src.utils.transforms.NegativeEdgeSampling
+        sample_neg_edges: false
+  transform_once_val:
+    _target_: torch_geometric.transforms.Compose
+    transforms:
+      - _target_: src.utils.transforms.NegativeEdgeSampling
+        sample_neg_edges: true
+  val_fold: 3
+  test_fold: 4
+
+logger:
+  tensorboard:
+    name: link_prediction_negative_sampling

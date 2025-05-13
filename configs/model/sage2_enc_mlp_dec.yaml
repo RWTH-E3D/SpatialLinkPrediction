@@ -1,0 +1,26 @@
+_target_: src.models.link_prediction_module.LinkPredictionLitModule
+visual_test_output_path: ${paths.output_dir}/visuals
+use_collision_edges: ??  # Must be set in experiment config
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+  weight_decay: 0.0006
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 100
+
+net:
+  _target_: src.models.components.models.GenericLinkPrediction
+  encoder:
+    _target_: src.models.components.encoders.SAGE2HopEncoder
+    in_channels: 59 # 15 (pos, rotation, extent) + 44 (ifc classes)
+    embedding_channels: 32
+  decoder:
+    _target_: src.models.components.decoders.MLPDecoder
+    embedding_channels: 32
