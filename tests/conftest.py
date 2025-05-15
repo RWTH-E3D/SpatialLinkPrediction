@@ -14,9 +14,9 @@ def cfg_train_global() -> DictConfig:
         with open_dict(cfg):
             cfg.paths.root_dir = str(pyrootutils.find_root())
             cfg.trainer.max_epochs = 1
-            cfg.trainer.limit_train_batches = 0.01
-            cfg.trainer.limit_val_batches = 0.1
-            cfg.trainer.limit_test_batches = 0.1
+            cfg.trainer.limit_train_batches = 0.3
+            cfg.trainer.limit_val_batches = 0.5
+            cfg.trainer.limit_test_batches = 0.5
             cfg.trainer.accelerator = "cpu"
             cfg.trainer.devices = 1
             cfg.datamodule.num_workers = 0
@@ -31,13 +31,15 @@ def cfg_train_global() -> DictConfig:
 @pytest.fixture(scope="package")
 def cfg_eval_global() -> DictConfig:
     with initialize(version_base="1.2", config_path="../configs"):
-        cfg = compose(config_name="eval.yaml", return_hydra_config=True, overrides=["ckpt_path=."])
+        cfg = compose(
+            config_name="eval.yaml", return_hydra_config=True, overrides=["ckpt_path=."]
+        )
 
         # set defaults for all tests
         with open_dict(cfg):
             cfg.paths.root_dir = str(pyrootutils.find_root())
             cfg.trainer.max_epochs = 1
-            cfg.trainer.limit_test_batches = 0.1
+            cfg.trainer.limit_test_batches = 0.25
             cfg.trainer.accelerator = "cpu"
             cfg.trainer.devices = 1
             cfg.datamodule.num_workers = 0

@@ -3,12 +3,14 @@
 defaults:
   - _self_
   - datamodule: mepgraph_link_pred.yaml # choose datamodule with `test_dataloader()` for evaluation
-  - model: mlp_link_pred.yaml
+  - model: mlp_enc_spatial_link_dec.yaml
   - logger: null
   - trainer: default.yaml
   - paths: default.yaml
   - extras: default.yaml
   - hydra: default.yaml
+
+  - experiment: link_prediction_collision_edges.yaml
 
 task_name: "eval"
 
